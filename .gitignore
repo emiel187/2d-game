@@ -1,0 +1,35 @@
+# Node modules
+node_modules/
+
+# Parcel cache
+.cache/
+
+# Dist folder
+dist/
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
+
+# Coverage reports
+coverage/
+
+# Build artifacts
+build/
+
+.parcel-cache
