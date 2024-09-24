@@ -6,7 +6,7 @@ class Player {
     this.y = y;
     this.width = canvasSettings.cellWidth;
     this.height = canvasSettings.cellHeight;
-    this.speed = 10;
+    this.speed = 5;
     this.jumpForce = 10;
     this.isJumping = false;
     this.health = 100;

@@ -30,15 +30,15 @@ function loadImage(src, onProgress) {
 
 export async function loadPlayerAssets(onProgress) {
     console.log('Loading player assets...');
-    const playerMovement = await loadImage('/assets/images/player/Player.png', onProgress);
-    const playerActions = await loadImage('/assets/images/player/Player_Actions.png', onProgress);
+    const playerMovement = await loadImage(require('../assets/images/player/Player.png'), onProgress);
+    const playerActions = await loadImage(require('../assets/images/player/Player_Actions.png'), onProgress);
 
     return { playerMovement, playerActions };
 }
 
 export async function loadLevelAssets(onProgress) {
     console.log('Loading level assets...');
-    // const levelBackground = await loadImage('../../assets/images/level/Background.png', onProgress);
+    // const levelBackground = await loadImage(require('../assets/images/level/Background.png'), onProgress);
 
-    return { levelBackground };
+    // return { levelBackground };
 }
