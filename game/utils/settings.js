@@ -31,6 +31,7 @@ export const entitySettings = {
     powerupColor: '#1565c0', // Color of powerups (Darker formal blue)
     guardColor: '#ff69b4', // Color of guards (funny pink color)
     explosiveColor: '#ffd54f', // Color of explosives (Yellow)
+    exitColor: '#4caf50', // Color of the exit (Green)
 };
 
 // Sound settings
@@ -48,6 +49,9 @@ export const controlSettings = {
     attack: 'a', // Key for attacking
     jump: ' ', // Key for jumping
     esc: 'Escape', // Key for going back to the welcome screen
+    pick: 'p', // Key for picking
+    axe: 'x', // Key for axe
+    potion: 'u', // Key for potion
 };
 
 // Add more settings as needed for other aspects of the game

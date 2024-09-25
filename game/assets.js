@@ -36,6 +36,21 @@ export async function loadPlayerAssets(onProgress) {
     return { playerMovement, playerActions };
 }
 
+export async function loadGuardAssets(onProgress) {
+    console.log('Loading guard assets...');
+    const orc1_Attack = await loadImage(require('../assets/images/enemies/orc1/orc1_attack_full.png'), onProgress);
+    const orc1_Death = await loadImage(require('../assets/images/enemies/orc1/orc1_death_full.png'), onProgress);
+    const orc1_Hurt = await loadImage(require('../assets/images/enemies/orc1/orc1_hurt_full.png'), onProgress);
+    const orc1_Idle = await loadImage(require('../assets/images/enemies/orc1/orc1_idle_full.png'), onProgress);
+    const orc1_Run = await loadImage(require('../assets/images/enemies/orc1/orc1_run_full.png'), onProgress);
+    const orc1_Run_Attack = await loadImage(require('../assets/images/enemies/orc1/orc1_run_attack_front_full.png'), onProgress);
+    const orc1_Walk = await loadImage(require('../assets/images/enemies/orc1/orc1_walk_full.png'), onProgress);
+    const orc1_Walk_Attack = await loadImage(require('../assets/images/enemies/orc1/orc1_walk_attack_front_full.png'), onProgress);
+
+    return { orc1_Attack, orc1_Death, orc1_Hurt, orc1_Idle, orc1_Run, orc1_Run_Attack, orc1_Walk, orc1_Walk_Attack };
+}
+
+
 export async function loadLevelAssets(onProgress) {
     console.log('Loading level assets...');
     // const levelBackground = await loadImage(require('../assets/images/level/Background.png'), onProgress);

@@ -43,9 +43,8 @@ class GameEngine {
                 const progress = Math.floor((loadedAssets / totalAssets) * 100);
                 updateSplashScreenProgress(progress);
             };
-            console.log('Loading player assets...');
+
             const playerAssets = await loadPlayerAssets(onProgress);
-            console.log('Loading level assets...');
             const levelAssets = await loadLevelAssets(onProgress);
 
             this.assets = { playerAssets, levelAssets };
@@ -71,8 +70,8 @@ class GameEngine {
         console.log('Showing screen:', screen);
         switch (screen) {
             case 'splash':
-                await this.initialize();
-                showSplashScreen(() => this.showScreen('welcome'));
+                // await this.initialize();
+                showSplashScreen(this.initialize.bind(this), () => this.showScreen('welcome'));
                 break;
             case 'welcome':
                 showWelcomeScreen(

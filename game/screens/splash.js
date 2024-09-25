@@ -3,7 +3,7 @@
 // - Briefly show before transitioning to the welcome screen
 // - Style: background color, logo/animation size and position
 
-export function showSplashScreen(onComplete) {
+export function showSplashScreen(initialise, onComplete) {
     const splashScreen = document.createElement('div');
     splashScreen.id = 'splash-screen';
     splashScreen.style.position = 'absolute';
@@ -21,11 +21,10 @@ export function showSplashScreen(onComplete) {
 
     document.body.appendChild(splashScreen);
 
-    // Simulate loading time
-    setTimeout(() => {
+    initialise().then(() => {
         onComplete();
         document.body.removeChild(splashScreen);
-    }, 8000); // Adjust the time as needed
+    });
 }
 
 export function updateSplashScreenProgress(progress) {
