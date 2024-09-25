@@ -15,15 +15,21 @@ class Guard {
   #height;
   #speed;
   #detectionRange;
-  #sprite;
+  #sprites;
+  #currentSprite;
 
   constructor(x, y, assets) {
     this.#position = { x, y };
+    this.action = 'idle';
+    this.movement = 'down';
     this.#width = canvasSettings.cellWidth;
     this.#height = canvasSettings.cellHeight;
     this.#speed = 2;
     this.#detectionRange = 5 * canvasSettings.cellWidth;
-    this.#sprite = assets.guardSprite;
+    this.#sprites = assets;
+    this.#currentSprite = this.#sprites.orc1_Idle;
+    this.frameCount = 0;
+    this.currentFrame = 0;
   }
 
   getPosition() {
@@ -32,38 +38,54 @@ class Guard {
 
   moveTowards(target) {
     // Implement movement logic towards target
+    this.action = 'run';
   }
 
   detectPlayer(playerPosition) {
     // Implement player detection logic
     // Return true if player is within detection range, false otherwise
+    return true;
   }
 
   attack() {
-    // Implement attack logic
-    console.log('Guard attacks!');
+    this.action = 'attack';
+    this.#currentSprite = this.#sprites.orc1_Attack;
   }
 
   defeat() {
-    // Implement defeat logic
-    console.log('Guard defeated!');
+    this.action = 'dead';
+    this.#currentSprite = this.#sprites.orc1_Death;
     // Return dropped items (powerups, explosives, keys)
   }
 
   update(playerPosition) {
+    const frames_per_action = 4;
+    this.frameCount++;
+    if (this.frameCount >= 10) {
+      this.frameCount = 0;
+      this.currentFrame = (this.currentFrame + 1) % frames_per_action;
+    }
     if (this.detectPlayer(playerPosition)) {
       this.moveTowards(playerPosition);
     }
   }
 
   draw(ctx) {
-    // ctx.drawImage(
-    //   this.#sprite,
-    //   this.#position.x,
-    //   this.#position.y,
-    //   this.#width,
-    //   this.#height
-    // );
+    let spriteHeight = 64;
+    let spriteWidth = 64;
+    let spriteX = this.currentFrame * spriteWidth;
+    let spriteY = 0;
+    ctx.drawImage(
+      this.#currentSprite,
+      spriteX,
+      spriteY,
+      spriteWidth,
+      spriteHeight,
+      this.#position.x,
+      this.#position.y,
+      this.#width,
+      this.#height
+    );
   }
 }
 

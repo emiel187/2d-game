@@ -53,7 +53,7 @@ export async function loadGuardAssets(onProgress) {
 
 export async function loadLevelAssets(onProgress) {
     console.log('Loading level assets...');
-    // const levelBackground = await loadImage(require('../assets/images/level/Background.png'), onProgress);
+    const rock = await loadImage(require('../assets/images/obstacle/Rock6_1.png'), onProgress);
 
-    // return { levelBackground };
+    return { rock };
 }

@@ -1,4 +1,4 @@
-import { canvasSettings } from '../utils/settings';
+import { canvasSettings } from "../utils/settings";
 
 // Wall entity class
 // - Represents the walls in the game
@@ -7,7 +7,6 @@ import { canvasSettings } from '../utils/settings';
 // - Could include collision detection logic specific to walls
 // - Might have different types of walls (e.g., breakable, unbreakable)
 // - Could include methods for special wall behaviors (e.g., secret passages)
-
 
 class Wall {
   #position;
@@ -19,12 +18,12 @@ class Wall {
   constructor(x, y, type, assets) {
     this.#position = {
       x: x,
-      y: y
+      y: y,
     };
     this.#width = canvasSettings.cellWidth;
     this.#height = canvasSettings.cellHeight;
     this.#type = type; // 'normal', 'breakable', 'secret'
-    this.#sprite = assets.wallSprite;
+    this.#sprite = assets.rock;
   }
 
   getPosition() {
@@ -50,24 +49,27 @@ class Wall {
 
     // Select sprite based on wall type
     switch (this.#type) {
-      case 'breakable':
+      case "breakable":
         spriteY = canvasSettings.cellHeight;
         break;
-      case 'secret':
+      case "secret":
         spriteY = canvasSettings.cellHeight * 2;
         break;
       default: // 'normal'
         spriteY = 0;
     }
 
-    // ctx.drawImage(
-    //   this.#sprite,
-    //   spriteX, spriteY, this.#width, this.#height,
-    //   this.#position.x, this.#position.y, this.#width, this.#height
-    // );
-
-    ctx.fillStyle = 'black';
-    ctx.fillRect(this.#position.x * canvasSettings.cellWidth, this.#position.y * canvasSettings.cellHeight, canvasSettings.cellWidth, canvasSettings.cellHeight);
+    ctx.drawImage(
+      this.#sprite,
+      spriteX,
+      spriteY,
+      this.#width,
+      this.#height,
+      this.#position.x,
+      this.#position.y,
+      this.#width,
+      this.#height
+    );
   }
 }
 

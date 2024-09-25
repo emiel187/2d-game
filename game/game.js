@@ -3,17 +3,16 @@ import {
   canvasSettings,
   playerSettings,
   gameSettings,
-  entitySettings,
 } from "./utils/settings.js";
 import Player from "./entities/player.js";
 import levelData from "./levels/level-data.js";
 import { clearContainer } from "./utils/canvas.js";
 import { isColliding } from "./utils/game.js";
-import Wall from './entities/wall';
-import Explosive from './entities/explosive';
-import Guard from './entities/guard';
-import Obstacle from './entities/obstacle';
-import Powerup from './entities/powerup';
+import Wall from "./entities/wall.js";
+import Explosive from "./entities/explosive.js";
+import Guard from "./entities/guard.js";
+import Obstacle from "./entities/obstacle.js";
+import Powerup from "./entities/powerup.js";
 
 // Main game logic
 // - Initialize the game board (labyrinth)
@@ -32,7 +31,7 @@ export class Game {
     this.board = [];
     this.entities = [];
     this.walls = [];
-    this.exit = null
+    this.exit = null;
     this.lives = playerSettings.initialLives;
     this.score = 0;
     this.currentLevel = gameSettings.initialLevel;
@@ -53,7 +52,14 @@ export class Game {
       for (let y = 0; y < level.layout.length; y++) {
         for (let x = 0; x < level.layout[y].length; x++) {
           if (level.layout[y][x] === "#") {
-            this.walls.push(new Wall(x * canvasSettings.cellWidth, y * canvasSettings.cellHeight, "normal", this.assets));
+            this.walls.push(
+              new Wall(
+                x * canvasSettings.cellWidth,
+                y * canvasSettings.cellHeight,
+                "normal",
+                this.assets.levelAssets
+              )
+            );
           }
           if (level.layout[y][x] === "X") {
             this.exit = {
@@ -156,17 +162,23 @@ export class Game {
           };
 
           switch (cell) {
-            case 'E':
-              this.explosives.push(new Explosive(position.x, position.y, this.assets));
+            case "E":
+              this.explosives.push(
+                new Explosive(position.x, position.y, this.assets)
+              );
               break;
-            case 'G':
-              this.guards.push(new Guard(position.x, position.y, this.assets));
+            case "G":
+              this.guards.push(new Guard(position.x, position.y, this.assets.guardAssets));
               break;
-            case 'O':
-              this.obstacles.push(new Obstacle(position.x, position.y, this.assets));
+            case "O":
+              this.obstacles.push(
+                new Obstacle(position.x, position.y, this.assets)
+              );
               break;
-            case 'P':
-              this.powerups.push(new Powerup(position.x, position.y, 'random', this.assets));
+            case "P":
+              this.powerups.push(
+                new Powerup(position.x, position.y, "random", this.assets)
+              );
               break;
           }
         }
@@ -176,10 +188,10 @@ export class Game {
 
   updateGameState() {
     this.player.update();
-    this.explosives.forEach(explosive => explosive.update());
-    this.guards.forEach(guard => guard.update(this.player.getPosition()));
-    this.obstacles.forEach(obstacle => obstacle.update());
-    this.powerups.forEach(powerup => powerup.update());
+    this.explosives.forEach((explosive) => explosive.update());
+    this.guards.forEach((guard) => guard.update(this.player.getPosition()));
+    this.obstacles.forEach((obstacle) => obstacle.update());
+    this.powerups.forEach((powerup) => powerup.update());
     this.checkCollisions();
     this.checkLevelCompletion();
   }
@@ -187,7 +199,7 @@ export class Game {
   checkCollisions() {
     const playerPosition = this.player.getPosition();
 
-    this.walls.forEach(wall => {
+    this.walls.forEach((wall) => {
       if (isColliding(playerPosition, wall.getPosition())) {
         this.player.collide(wall);
       }
@@ -246,13 +258,13 @@ export class Game {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Draw the walls
-    this.walls.forEach(wall => wall.draw(this.context));
+    this.walls.forEach((wall) => wall.draw(this.context));
 
     // Draw the entities
-    this.explosives.forEach(explosive => explosive.draw(this.context));
-    this.guards.forEach(guard => guard.draw(this.context));
-    this.obstacles.forEach(obstacle => obstacle.draw(this.context));
-    this.powerups.forEach(powerup => powerup.draw(this.context));
+    this.explosives.forEach((explosive) => explosive.draw(this.context));
+    this.guards.forEach((guard) => guard.draw(this.context));
+    this.obstacles.forEach((obstacle) => obstacle.draw(this.context));
+    this.powerups.forEach((powerup) => powerup.draw(this.context));
 
     // Draw the player
     this.player.draw(this.context);

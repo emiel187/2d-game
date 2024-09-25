@@ -1,5 +1,5 @@
 import { Game } from './game.js';
-import { loadPlayerAssets, loadLevelAssets } from './assets.js';
+import { loadPlayerAssets, loadLevelAssets, loadGuardAssets, loadLevelAssets } from './assets.js';
 import { showSplashScreen, updateSplashScreenProgress } from './screens/splash.js';
 import { showWelcomeScreen, showGameOverScreen, showHighScoreScreen, showLevelCompletedScreen } from './screens/index.js';
 import { canvasSettings, controlSettings } from './utils/settings.js';
@@ -46,8 +46,9 @@ class GameEngine {
 
             const playerAssets = await loadPlayerAssets(onProgress);
             const levelAssets = await loadLevelAssets(onProgress);
+            const guardAssets = await loadGuardAssets(onProgress);
 
-            this.assets = { playerAssets, levelAssets };
+            this.assets = { playerAssets, levelAssets, guardAssets };
             this.game = new Game(this.container.id, this.canvas, this.context, this.assets);
             this.showScreen('welcome');
             this.setupGameControls();
