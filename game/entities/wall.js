@@ -1,5 +1,5 @@
-import Entity from './entity';
-import { canvasSettings } from "../utils/settings";
+import Entity from './entity.js';
+import { canvasSettings } from "../utils/settings.js";
 
 // Wall entity class
 // - Represents the walls in the game

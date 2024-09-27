@@ -1,6 +1,7 @@
-import Entity from "./entity";
-import { canvasSettings, entitySettings } from "../utils/settings";
-import { isColliding } from "../utils/game";
+import Entity from "./entity.js";
+import { canvasSettings, entitySettings } from "../utils/settings.js";
+import { isColliding } from "../utils/game.js";
+
 // Guard entity class
 // - Represents the guards in the game
 // - Can move towards the player

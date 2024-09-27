@@ -14,7 +14,6 @@ import Guard from "./entities/guard.js";
 import Obstacle from "./entities/obstacle.js";
 import Powerup from "./entities/powerup.js";
 import Exit from "./entities/exit.js";
-import { showGameOverScreen } from "./screens/game-over.js";
 
 // Main game logic
 // - Initialize the game board (labyrinth)

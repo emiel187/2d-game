@@ -1,4 +1,4 @@
-import Entity from "./entity";
+import Entity from "./entity.js";
 
 // Exit entity class
 // - Represents the exit in the game

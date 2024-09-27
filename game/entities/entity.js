@@ -1,4 +1,4 @@
-import { canvasSettings } from '../utils/settings';
+import { canvasSettings } from '../utils/settings.js';
 
 class Entity {
   _position;

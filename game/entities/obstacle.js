@@ -1,5 +1,4 @@
-import Entity from "./entity";
-import { canvasSettings } from "../utils/settings";
+import Entity from "./entity.js";
 
 // Obstacle entity class
 // - Represents the obstacles in the game

@@ -1,4 +1,4 @@
-import Entity from './entity';
+import Entity from './entity.js';
 
 // Powerup entity class
 // - Represents the powerups in the game
