@@ -32,7 +32,7 @@ class Guard extends Entity {
     ];
     this.#speed = 1;
     this.#detectionRange = 5 * canvasSettings.cellWidth;
-    this.#currentSprite = this._sprites["idle"];
+    this.#currentSprite = this._sprites.idle;
     this.frameCount = 0;
     this.currentFrame = 0;
   }
@@ -62,7 +62,7 @@ class Guard extends Entity {
     }
 
     // Check if movement is possible (not blocked by a wall)
-    const nextPosition = { ...this._position };
+    const nextPosition = { ...this._position, width: canvasSettings.cellWidth / 2, height: canvasSettings.cellHeight / 2 };
     switch (this.movement) {
       case "up":
         nextPosition.y -= this.#speed;
@@ -78,14 +78,28 @@ class Guard extends Entity {
         break;
     }
 
-    const willCollide = walls.some((wall) =>
+    const willCollideWithWalls = walls.some((wall) =>
       isColliding(nextPosition, wall.getHitBox())
     );
-    if (!willCollide) {
+
+    const willCollideWithPlayer = isColliding(nextPosition, target);
+    if (willCollideWithPlayer) {
+      console.log("Attacking player");
+      // Determine guard's facing direction based on target position
+      if (Math.abs(dx) > Math.abs(dy)) {
+        this.movement = dx > 0 ? "right" : "left";
+      } else {
+        this.movement = dy > 0 ? "down" : "up";
+      }
+      this.attack();
+
+    } else if (!willCollideWithWalls) {
+      console.log("Moving towards player");
       this._position = nextPosition;
-      this.action = "walk";
+      this.walk();
     } else {
-      this.action = "idle";
+      console.log("Idle");
+      this.idle();
     }
   }
 
@@ -121,21 +135,44 @@ class Guard extends Entity {
     return false; // Player out of detection range
   }
 
+  idle() {
+    this.action = "idle";
+    this.#currentSprite = this._sprites.idle;
+  }
+
+  walk() {
+    this.action = "walk";
+    this.#currentSprite = this._sprites.walk;
+  }
+
   attack() {
     this.action = "attack";
-    this.#currentSprite = this._sprites["attack"];
+    this.#currentSprite = this._sprites.attack;
   }
 
   defeat() {
     this.action = "dead";
-    this.#currentSprite = this._sprites["death"];
+    this.#currentSprite = this._sprites.death;
     // Return dropped items (powerups, explosives, keys)
+  }
+
+  lookAround() {
+    this.action = "idle";
+    this.#currentSprite = this._sprites.idle;
+    const directions = ['up', 'right', 'down', 'left'];
+    const currentIndex = directions.indexOf(this.movement);
+    if (currentIndex !== -1) {
+      this.movement = directions[(currentIndex + 1) % 4];
+    } else {
+      this.movement = 'up';
+    }
   }
 
   update(playerPosition, walls) {
     const frames_per_action = 4;
+    const frames_per_look = this.action === 'idle' ? 60*3 : 0; // Look around every 60 frames (about 1 second at 60 FPS)
     this.frameCount++;
-    if (this.frameCount >= 10) {
+    if (this.frameCount >= Math.max(frames_per_action, frames_per_look)) {
       this.frameCount = 0;
       this.currentFrame = (this.currentFrame + 1) % frames_per_action;
     }
@@ -143,12 +180,12 @@ class Guard extends Entity {
     if (this.detectPlayer(playerPosition, walls)) {
       this.moveTowards(playerPosition, walls);
     } else {
-      this.action = "idle";
+      if (this.frameCount % frames_per_look === 0) {
+        this.lookAround();
+      } else {
+        this.idle();
+      }
     }
-
-    // Update current sprite based on action
-    this.#currentSprite =
-      this._sprites[this.action === "walk" ? "walk" : "idle"];
   }
 
   draw(ctx) {
@@ -160,47 +197,31 @@ class Guard extends Entity {
     // Determine spriteY based on movement direction
     switch (this.movement) {
       case "down":
-        spriteY = 0;
+        spriteY = 0 * spriteHeight;
+        break;
+     case "up":
+        spriteY = 1 * spriteHeight;
         break;
       case "left":
-        spriteY = spriteHeight;
+        spriteY = 2 * spriteHeight;
         break;
       case "right":
-        spriteY = spriteHeight;
+        spriteY = 3 * spriteHeight;
         break;
-      case "up":
-        spriteY = spriteHeight * 2;
-        break;
+      
     }
 
-    ctx.save();
-    if (this.movement === "left") {
-      ctx.scale(-1, 1);
-      ctx.drawImage(
+    ctx.drawImage(
         this.#currentSprite,
         spriteX,
         spriteY,
         spriteWidth,
         spriteHeight,
-        -this._position.x - this._width,
+        this._position.x - 10,
         this._position.y,
         this._width,
         this._height
       );
-    } else {
-      ctx.drawImage(
-        this.#currentSprite,
-        spriteX,
-        spriteY,
-        spriteWidth,
-        spriteHeight,
-        this._position.x,
-        this._position.y,
-        this._width,
-        this._height
-      );
-    }
-    ctx.restore();
   }
 }
 

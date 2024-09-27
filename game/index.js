@@ -1,7 +1,7 @@
 import { Game } from './game.js';
 import { loadPlayerAssets, loadLevelAssets, loadGuardAssets, loadPowerUpsAssets, } from './assets.js';
 import { showSplashScreen, updateSplashScreenProgress } from './screens/splash.js';
-import { showWelcomeScreen, showGameOverScreen, showHighScoreScreen, showLevelCompletedScreen } from './screens/index.js';
+import { showWelcomeScreen, showGameOverScreen, showHighScoreScreen, showLevelCompletedScreen, showStoryScreen } from './screens/index.js';
 import { canvasSettings, controlSettings } from './utils/settings.js';
 
 // Entry point of the game
@@ -81,8 +81,12 @@ class GameEngine {
                     () => this.startGame(),
                     this.game && this.game.started ? () => this.continueGame() : null,
                     () => this.highScore(),
-                    () => this.gameOver()
+                    () => this.gameOver(),
+                    () => this.story()
                 );
+                break;
+            case 'story':
+                showStoryScreen(() => this.showScreen('welcome'));
                 break;
             case 'game':
                 console.log('Starting game...', this.game.canvas);
@@ -106,6 +110,11 @@ class GameEngine {
             default:
                 console.error('Unknown screen:', screen);
         }
+    }
+
+    story() {
+        this.currentScreen = 'story';
+        this.showScreen(this.currentScreen);
     }
 
     startGame() {

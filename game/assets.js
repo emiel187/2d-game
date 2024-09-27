@@ -138,8 +138,22 @@ export async function loadLevelAssets(onProgress) {
     require("../assets/images/obstacle/Rock6_1.png"),
     onProgress
   );
+  const sandRuin = await loadImage(
+    require("../assets/images/exit/Sand_ruins3.png"),
+    onProgress
+  );    
 
-  return { rock };
+  const snowRuin = await loadImage(
+    require("../assets/images/exit/Snow_ruins3.png"),
+    onProgress
+  );
+
+  const yellowRuin = await loadImage(
+    require("../assets/images/exit/Yellow_ruins3.png"),
+    onProgress
+  );
+
+  return { rock, sandRuin, snowRuin, yellowRuin };
 }
 
 export async function loadPowerUpsAssets(onProgress) {

@@ -6,7 +6,7 @@ import { theme, applyContainerStyles, styleButton } from '../utils/theme.js';
 // - Style: background color, text color, font size, button styles
 // - Include sound control (mute/unmute button)
 
-export function showWelcomeScreen(onStartGame, onContinueGame, onViewHighScores, onExit) {
+export function showWelcomeScreen(onStartGame, onContinueGame, onViewHighScores, onExit, onStory) {
     const container = document.getElementById('game-container');
     container.innerHTML = ''; // Clear previous content
 
@@ -14,9 +14,23 @@ export function showWelcomeScreen(onStartGame, onContinueGame, onViewHighScores,
     welcomeScreen.id = 'welcome-screen';
 
     const title = document.createElement('h1');
-    title.textContent = 'Welcome to the Game!';
+    title.textContent = 'Welcome to Wandertrap!';
+    title.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.5)';
+    title.style.background = 'linear-gradient(45deg, #FFD700, #FFA500)';
+    title.style.WebkitBackgroundClip = 'text';
+    title.style.WebkitTextFillColor = 'transparent';
+    title.style.display = 'inline-block';
     welcomeScreen.appendChild(title);
 
+    const subtitle = document.createElement('h2');
+    subtitle.textContent = 'Theo got lost...';
+    subtitle.style.color = theme.colors.primary;
+    subtitle.style.fontSize = theme.fontSize.subtitle;
+    subtitle.style.fontFamily = theme.fonts.subtitle;
+    subtitle.style.marginBottom = '30px';
+    welcomeScreen.appendChild(subtitle);
+
+    
     if (onContinueGame) {
         const continueButton = document.createElement('button');
         continueButton.textContent = 'Continue';
@@ -29,6 +43,12 @@ export function showWelcomeScreen(onStartGame, onContinueGame, onViewHighScores,
     startButton.textContent = 'New Game';
     startButton.onclick = onStartGame;
     welcomeScreen.appendChild(startButton);
+
+    const storyButton = document.createElement('button');
+    storyButton.textContent = 'Story';
+    storyButton.onclick = onStory;
+    welcomeScreen.appendChild(storyButton);
+    styleButton(storyButton, theme.colors.primary);
 
     const highScoresButton = document.createElement('button');
     highScoresButton.textContent = 'High Scores';

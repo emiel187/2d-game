@@ -13,6 +13,7 @@ import Explosive from "./entities/explosive.js";
 import Guard from "./entities/guard.js";
 import Obstacle from "./entities/obstacle.js";
 import Powerup from "./entities/powerup.js";
+import Exit from "./entities/exit.js";
 
 // Main game logic
 // - Initialize the game board (labyrinth)
@@ -62,17 +63,11 @@ export class Game {
             );
           }
           if (level.layout[y][x] === "X") {
-            this.exit = {
-              row: y,
-              col: x,
-              type: "exit",
-              position: {
-                x: x * canvasSettings.cellWidth,
-                y: y * canvasSettings.cellHeight,
-              },
-              width: canvasSettings.cellWidth,
-              height: canvasSettings.cellHeight,
-            };
+            this.exit = new Exit(
+              x * canvasSettings.cellWidth,
+              y * canvasSettings.cellHeight,
+              this.assets.levelAssets
+            );
           }
         }
       }
@@ -284,6 +279,11 @@ export class Game {
     this.guards.forEach((guard) => guard.draw(this.context));
     this.obstacles.forEach((obstacle) => obstacle.draw(this.context));
     this.powerups.forEach((powerup) => powerup.draw(this.context));
+
+    // Draw the exit
+    if (this.exit) {
+      this.exit.draw(this.context);
+    }
 
     // Draw the player
     this.player.draw(this.context);

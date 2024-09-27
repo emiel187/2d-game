@@ -4,8 +4,8 @@
 
 // Canvas settings
 export const canvasSettings = {
-    width: 800, // Width of the game canvas
-    height: 600, // Height of the game canvas
+    width: 64*20, // Width of the game canvas
+    height: 64*10, // Height of the game canvas
     backgroundColor: '#2c2c2c', // Background color of the canvas
     cellWidth: 64, // Width of each cell in the game
     cellHeight: 64, // Height of each cell in the game

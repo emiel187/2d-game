@@ -3,26 +3,28 @@
 
 export const theme = {
     colors: {
-        background: '#2c2c2c',
-        text: '#f0f0f0',
-        primary: '#ff69b4', // Funny pink color
-        secondary: '#1565c0', // Darker formal blue
-        accent: '#c62828', // Carmen red
+        background: '#1a0d00', // Dark brown for dungeon feel
+        text: '#d4af37', // Gold text for fantasy vibe
+        primary: '#8B4513', // Saddle brown to complement the existing colors
+        secondary: '#2e8b57', // Forest green for maze-like atmosphere
+        accent: '#ff4500', // Fiery orange for danger
     },
     fonts: {
-        main: 'Arial, sans-serif',
+        main: '"Luminari", "Papyrus", fantasy', // Quirky fantasy fonts
+        subtitle: '"Arial", sans-serif', // More readable font for subtitles
     },
     fontSize: {
-        title: '48px',
-        subtitle: '24px',
+        title: '52px',
+        subtitle: '28px',
         button: '24px',
     },
     spacing: {
-        padding: '20px',
+        padding: '25px',
     },
     button: {
-        padding: '20px 40px',
-        borderRadius: '10px',
+        minWidth: '265px',
+        padding: '15px 35px',
+        borderRadius: '4px', // Sharp edges for a more labyrinthine feel
     },
 };
 
@@ -44,6 +46,19 @@ export function styleButton(button, color = theme.colors.primary) {
     button.style.cursor = 'pointer';
     button.style.backgroundColor = color;
     button.style.color = theme.colors.text;
-    button.style.border = 'none';
+    button.style.border = '2px solid ' + theme.colors.text;
     button.style.borderRadius = theme.button.borderRadius;
+    button.style.textTransform = 'uppercase';
+    button.style.letterSpacing = '2px';
+    button.style.boxShadow = '0 0 10px rgba(212, 175, 55, 0.5)';
+    button.style.transition = 'all 0.3s ease';
+    button.style.minWidth = theme.button.minWidth;
+
+    // Add hover effect
+    button.addEventListener('mouseover', () => {
+        button.style.transform = 'scale(1.1)';
+    });
+    button.addEventListener('mouseout', () => {
+        button.style.transform = 'scale(1)';
+    });
 }

@@ -8,8 +8,8 @@ import Entity from "./entity";
 
 class Exit extends Entity {
   constructor(x, y, assets) {
-    super(x, y);
-    this._sprite = assets.exit;
+    super(x, y, 'exit', assets);
+    this._sprite = assets.yellowRuin;
   }
 
   draw(ctx) {
