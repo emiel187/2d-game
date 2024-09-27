@@ -1,54 +1,55 @@
-import { canvasSettings } from '../utils/settings';
+import Entity from './entity';
 
 // Powerup entity class
 // - Represents the powerups in the game
 // - Can be collected by the player
 // - Can be dropped by guards
 // - Can be dropped by obstacles
-// - Can be dropped by keys
-// - Can be dropped by keys
-
-class Powerup {
-  #position;
-  #width;
-  #height;
-  #type;
-  #sprite;
+// - Properties: position, type, collected
+// - Methods: collect (mark as collected), update, draw
+class Powerup extends Entity {
+  #collected;
 
   constructor(x, y, type, assets) {
-    this.#position = { x, y };
-    this.#width = canvasSettings.cellWidth;
-    this.#height = canvasSettings.cellHeight;
-    this.#type = type; // e.g., 'speed', 'invincibility', 'extra_life'
-    this.#sprite = assets.powerupSprite;
+    super(x, y, type, assets);
+    this.#collected = false;
   }
 
-  getPosition() {
-    return { ...this.#position };
-  }
-
-  getType() {
-    return this.#type;
+  selectSprites(assets) {
+    switch (this._type) {
+      case "health":
+        return { crystal: assets.redCrystal };
+      case "speed":
+        return { crystal: assets.blueCrystal };
+      case "strength":
+        return { crystal: assets.greenCrystal };
+      case "invincibility":
+        return { crystal: assets.yellowCrystal };
+      default:
+        return { crystal: assets.blueCrystal };
+    }
   }
 
   collect() {
-    // Implement collection logic
-    console.log(`Powerup collected: ${this.#type}`);
-    // Return the powerup effect
+    if (!this.#collected) {
+      this.#collected = true;
+      console.log(`Powerup collected: ${this._type}`);
+      // Return the powerup effect
+    }
   }
 
-  update() {
-    // Update powerup state if needed
-  }
+  // ... rest of the Powerup class methods ...
 
   draw(ctx) {
-    // ctx.drawImage(
-    //   this.#sprite,
-    //   this.#position.x,
-    //   this.#position.y,
-    //   this.#width,
-    //   this.#height
-    // );
+    if (!this.#collected) {
+      ctx.drawImage(
+        this._sprites.crystal,
+        this._position.x,
+        this._position.y,
+        this._width,
+        this._height
+      );
+    }
   }
 }
 

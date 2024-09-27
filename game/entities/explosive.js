@@ -1,28 +1,18 @@
-import { canvasSettings } from '../utils/settings';
+import Entity from './entity';
 
 // Explosive entity
 // - Properties: position, isHidden (under obstacle), isActive
 // - Methods: detonate (trigger explosion), checkCollision (with player)
 // - Handle explosion effects (reduce player lives, visual effects)
-class Explosive {
-  #position;
-  #width;
-  #height;
+class Explosive extends Entity {
   #isHidden;
   #isActive;
-  #sprite;
 
   constructor(x, y, assets) {
-    this.#position = { x, y };
-    this.#width = canvasSettings.cellWidth;
-    this.#height = canvasSettings.cellHeight;
+    super(x, y);
     this.#isHidden = true;
     this.#isActive = false;
-    this.#sprite = assets.explosiveSprite;
-  }
-
-  getPosition() {
-    return { ...this.#position };
+    this._sprite = assets.explosiveSprite;
   }
 
   isHidden() {
@@ -55,11 +45,11 @@ class Explosive {
   draw(ctx) {
     if (!this.#isHidden) {
       ctx.drawImage(
-        this.#sprite,
-        this.#position.x,
-        this.#position.y,
-        this.#width,
-        this.#height
+        this._sprite,
+        this._position.x,
+        this._position.y,
+        this._width,
+        this._height
       );
     }
   }

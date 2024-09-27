@@ -1,58 +1,118 @@
+import Entity from './entity';
 import { canvasSettings } from "../utils/settings";
 
-class Player {
-    #position;
-    #width;
-    #height;
-    #health;
-    #speed;
-    #sprite;
-  constructor(x, y, assets) {
+class Player extends Entity {
+  #health;
+  #speed;
+  #blockedDirections;
 
-    this.#position = { x, y };
-    this.#width = canvasSettings.cellWidth;
-    this.#height = canvasSettings.cellHeight
-    this.#speed = 5;
+  constructor(x, y, assets) {
+    super(x, y, 'player', assets);
     this.#health = 100;
+    this.#speed = 5;
     this.explosives = [];
     this.keys = [];
     this.powerups = [];
-
-    this.spriteMovement = assets.playerMovement;
-    this.spriteActions = assets.playerActions;
+    this.#blockedDirections = {
+      left: false,
+      right: false,
+      up: false,
+      down: false
+    };
 
     this.currentFrame = 0;
     this.frameCount = 0;
     this.movement = "down";
-    this.action = "idle"; // Possible actions: 'idle', 'walk', 'jump', 'attack'
+    this.action = "idle";
   }
 
-  getPosition() {
-    return { ...this.#position };
+  selectSprites(assets) {
+    return {
+      movement: assets.playerMovement,
+      actions: assets.playerActions
+    };
+  }
+
+  getPickupRange() {
+    return {
+      x: this._position.x,
+      y: this._position.y,
+      width: this._width,
+      height: this._height,
+    };
+  }
+
+  getHitBox() {
+    return {
+      x: this._position.x + this._width * 0.25,
+      y: this._position.y + this._height * 0.25,
+      width: this._width * 0.5,
+      height: this._height * 0.5,
+    };
+  }
+
+  collide(entity) {
+    if (this.action !== "idle") {
+      console.log("Colliding", this.action, entity.getPosition());
+      this.action = "idle";
+      
+      // Determine which direction is blocked
+      const entityPos = entity.getPosition();
+      const playerPos = this.getPosition();
+      
+      if (entityPos.x < playerPos.x) {
+        this.#blockedDirections.left = true;
+      } else if (entityPos.x > playerPos.x) {
+        this.#blockedDirections.right = true;
+      }
+      
+      if (entityPos.y < playerPos.y) {
+        this.#blockedDirections.up = true;
+      } else if (entityPos.y > playerPos.y) {
+        this.#blockedDirections.down = true;
+      }
+      console.log("blocked directions", this.#blockedDirections);
+    }
+  }
+
+  canMove(direction) {
+    return !this.#blockedDirections[direction];
   }
 
   moveLeft() {
-    this.#position.x -= this.#speed;
-    this.action = "walk";
-    this.movement = "left";
+    if (this.canMove('left')) {
+      this._position.x -= this.#speed;
+      this.action = "walk";
+      this.movement = "left";
+      this.#blockedDirections.right = false;
+    }
   }
 
   moveRight() {
-    this.#position.x += this.#speed;
-    this.action = "walk";
-    this.movement = "right";
+    if (this.canMove('right')) {
+      this._position.x += this.#speed;
+      this.action = "walk";
+      this.movement = "right";
+      this.#blockedDirections.left = false;
+    }
   }
 
   moveUp() {
-    this.#position.y -= this.#speed;
-    this.action = "walk";
-    this.movement = "up";
+    if (this.canMove('up')) {
+      this._position.y -= this.#speed;
+      this.action = "walk";
+      this.movement = "up";
+      this.#blockedDirections.down = false;
+    }
   }
 
   moveDown() {
-    this.#position.y += this.#speed;
-    this.action = "walk";
-    this.movement = "down";
+    if (this.canMove('down')) {
+      this._position.y += this.#speed;
+      this.action = "walk";
+      this.movement = "down";
+      this.#blockedDirections.up = false;
+    }
   }
 
   attack() {
@@ -67,7 +127,7 @@ class Player {
     console.log("Picking");
     // Determine which object we are trying to pick based on player's position and direction
     const pickRange = 32; // Assuming a pick range of 32 pixels (half a cell)
-    let pickPosition = { x: this.#position.x, y: this.#position.y };
+    let pickPosition = { x: this._position.x, y: this._position.y };
 
     // Adjust pick position based on player's movement direction
     switch (this.movement) {
@@ -123,33 +183,8 @@ class Player {
     console.log(`Collected powerup: ${powerup}`);
   }
 
-  collide(entity) {
-    if (this.action !== "idle") {
-      console.log("Colliding", this.action, entity.position);
-      this.action = "idle";
-
-      // Calculate the center of the current tile
-      const tileSize = 64; // Assuming a tile size of 32 pixels
-      const centerX =
-        Math.floor(this.#position.x / tileSize) * tileSize + tileSize / 2;
-      const centerY =
-        Math.floor(this.#position.y / tileSize) * tileSize + tileSize / 2;
-
-      // Move the player to the center of the current tile
-      this.#position.x = centerX - this.#width / 2;
-      this.#position.y = centerY - this.#height / 2;
-
-      // Temporarily disable movement
-      const originalSpeed = this.#speed;
-      this.#speed = 0;
-      setTimeout(() => {
-        this.#speed = originalSpeed;
-      }, 500); // Adjust this value to control the duration of movement disable
-    }
-  }
-
   update() {
-    // Update player state, handle gravity, etc.
+    // Don't reset blocked directions here
     this.frameCount++;
     if (this.frameCount >= 10) {
       // Adjust frame rate as needed
@@ -174,12 +209,32 @@ class Player {
     }
   }
 
+  // Add a new method to check for collisions before moving
+  checkCollision(direction) {
+    const nextPosition = { ...this._position };
+    switch (direction) {
+      case 'left':
+        nextPosition.x -= this.#speed;
+        break;
+      case 'right':
+        nextPosition.x += this.#speed;
+        break;
+      case 'up':
+        nextPosition.y -= this.#speed;
+        break;
+      case 'down':
+        nextPosition.y += this.#speed;
+        break;
+    }
+    return nextPosition;
+  }
+
   draw(ctx) {
     let spriteHeight = 32;
     let spriteWidth = 32;
     let spriteX = 0;
     let spriteY = 0;
-    let spriteSheet = this.spriteMovement;
+    let spriteSheet = this._sprites.movement;
     // mapping the sprite sheet to the actions
     switch (this.action) {
       case "walk":
@@ -233,16 +288,16 @@ class Player {
       case "pick":
         spriteHeight = 48;
         spriteWidth = 48;
-        spriteSheet = this.spriteActions;
+        spriteSheet = this._sprites.actions;
         switch (this.movement) {
           case "down":
-            spriteY = 0 * spriteHeight;
+            spriteY = 1 * spriteHeight;
             break;
           case "left":
-            spriteY = 1 * spriteHeight;
+            spriteY = 0 * spriteHeight;
             break;
           case "right":
-            spriteY = 1 * spriteHeight;
+            spriteY = 0 * spriteHeight;
             break;
           case "up":
             spriteY = 2 * spriteHeight;
@@ -252,14 +307,30 @@ class Player {
       case "axe":
         spriteHeight = 48;
         spriteWidth = 48;
-        spriteSheet = this.spriteActions;
+        spriteSheet = this._sprites.actions;
+        spriteX = 3 * spriteWidth;
         spriteY = 10 * spriteHeight;
         break;
       case "potion":
         spriteHeight = 48;
         spriteWidth = 48;
-        spriteSheet = this.spriteActions;
-        spriteY = 11 * spriteHeight;
+        spriteSheet = this._sprites.actions;
+        // spriteY = 11 * spriteHeight;
+        switch (this.movement) {
+            case "down":
+              spriteY = 9 * spriteHeight;
+              break;
+            case "left":
+              spriteY = 9 * spriteHeight;
+              break;
+            case "right":
+              spriteY = 9 * spriteHeight;
+              break;
+            case "up":
+              spriteY = 10 * spriteHeight;
+              break;
+          }
+          break;
         break;
       case "idle":
       default:
@@ -288,29 +359,56 @@ class Player {
     if (this.movement === "left") {
       ctx.scale(-1, 1);
       ctx.drawImage(
-        this.spriteMovement,
+        spriteSheet,
         spriteX,
         spriteY,
         spriteWidth,
         spriteHeight,
-        -this.#position.x - this.#width,
-        this.#position.y,
+        -this._position.x - this._width,
+        this._position.y,
         canvasSettings.cellWidth,
         canvasSettings.cellHeight
       );
     } else {
       ctx.drawImage(
-        this.spriteMovement,
+        spriteSheet,
         spriteX,
         spriteY,
         spriteWidth,
         spriteHeight,
-        this.#position.x,
-        this.#position.y,
+        this._position.x,
+        this._position.y,
         canvasSettings.cellWidth,
         canvasSettings.cellHeight
       );
     }
+    ctx.restore();
+    this.drawBoundingBox(ctx);
+  }
+
+  drawBoundingBox(ctx) {
+    // Hitbox
+    ctx.save();
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(
+      this._position.x + this._width * 0.25,
+      this._position.y + this._height * 0.25,
+      this._width * 0.5,
+      this._height * 0.5
+    );
+    ctx.restore();
+    ctx.save();
+
+    // Pickup range
+    ctx.strokeStyle = 'green';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(
+      this._position.x,
+      this._position.y,
+      this._width,
+      this._height
+    );
     ctx.restore();
   }
 }

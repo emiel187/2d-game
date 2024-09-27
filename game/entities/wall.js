@@ -1,3 +1,4 @@
+import Entity from './entity';
 import { canvasSettings } from "../utils/settings";
 
 // Wall entity class
@@ -8,26 +9,13 @@ import { canvasSettings } from "../utils/settings";
 // - Might have different types of walls (e.g., breakable, unbreakable)
 // - Could include methods for special wall behaviors (e.g., secret passages)
 
-class Wall {
-  #position;
-  #width;
-  #height;
+class Wall extends Entity {
   #type;
-  #sprite;
 
   constructor(x, y, type, assets) {
-    this.#position = {
-      x: x,
-      y: y,
-    };
-    this.#width = canvasSettings.cellWidth;
-    this.#height = canvasSettings.cellHeight;
+    super(x, y);
     this.#type = type; // 'normal', 'breakable', 'secret'
-    this.#sprite = assets.rock;
-  }
-
-  getPosition() {
-    return { ...this.#position };
+    this._sprite = assets.rock;
   }
 
   getType() {
@@ -60,15 +48,15 @@ class Wall {
     }
 
     ctx.drawImage(
-      this.#sprite,
+      this._sprite,
       spriteX,
       spriteY,
-      this.#width,
-      this.#height,
-      this.#position.x,
-      this.#position.y,
-      this.#width,
-      this.#height
+      this._width,
+      this._height,
+      this._position.x,
+      this._position.y,
+      this._width,
+      this._height
     );
   }
 }

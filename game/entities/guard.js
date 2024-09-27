@@ -1,4 +1,6 @@
-import { canvasSettings } from '../utils/settings';
+import Entity from "./entity";
+import { canvasSettings, entitySettings } from "../utils/settings";
+import { isColliding } from "../utils/game";
 // Guard entity class
 // - Represents the guards in the game
 // - Can move towards the player
@@ -9,65 +11,144 @@ import { canvasSettings } from '../utils/settings';
 // - Can drop explosives when defeated
 // - Can drop keys when defeated
 // - Can drop keys when defeated
-class Guard {
-  #position;
-  #width;
-  #height;
+
+class Guard extends Entity {
   #speed;
   #detectionRange;
-  #sprites;
   #currentSprite;
 
-  constructor(x, y, assets) {
-    this.#position = { x, y };
-    this.action = 'idle';
-    this.movement = 'down';
-    this.#width = canvasSettings.cellWidth;
-    this.#height = canvasSettings.cellHeight;
-    this.#speed = 2;
+  constructor(x, y, type, assets) {
+    super(
+      x,
+      y,
+      type,
+      assets,
+      entitySettings.enemyWidth,
+      entitySettings.enemyHeight
+    );
+    this.action = "idle";
+    this.movement = ["down", "up", "left", "right"][
+      Math.floor(Math.random() * 4)
+    ];
+    this.#speed = 1;
     this.#detectionRange = 5 * canvasSettings.cellWidth;
-    this.#sprites = assets;
-    this.#currentSprite = this.#sprites.orc1_Idle;
+    this.#currentSprite = this._sprites["idle"];
     this.frameCount = 0;
     this.currentFrame = 0;
   }
 
-  getPosition() {
-    return { ...this.#position };
+  selectSprites(assets) {
+    return {
+      attack: assets[`${this._type}_Attack`],
+      death: assets[`${this._type}_Death`],
+      hurt: assets[`${this._type}_Hurt`],
+      idle: assets[`${this._type}_Idle`],
+      run: assets[`${this._type}_Run`],
+      runAttack: assets[`${this._type}_Run_Attack`],
+      walk: assets[`${this._type}_Walk`],
+      walkAttack: assets[`${this._type}_Walk_Attack`],
+    };
   }
 
-  moveTowards(target) {
-    // Implement movement logic towards target
-    this.action = 'run';
+  moveTowards(target, walls) {
+    const dx = target.x - this._position.x;
+    const dy = target.y - this._position.y;
+
+    // Determine primary direction
+    if (Math.abs(dx) > Math.abs(dy)) {
+      this.movement = dx > 0 ? "right" : "left";
+    } else {
+      this.movement = dy > 0 ? "down" : "up";
+    }
+
+    // Check if movement is possible (not blocked by a wall)
+    const nextPosition = { ...this._position };
+    switch (this.movement) {
+      case "up":
+        nextPosition.y -= this.#speed;
+        break;
+      case "down":
+        nextPosition.y += this.#speed;
+        break;
+      case "left":
+        nextPosition.x -= this.#speed;
+        break;
+      case "right":
+        nextPosition.x += this.#speed;
+        break;
+    }
+
+    const willCollide = walls.some((wall) =>
+      isColliding(nextPosition, wall.getHitBox())
+    );
+    if (!willCollide) {
+      this._position = nextPosition;
+      this.action = "walk";
+    } else {
+      this.action = "idle";
+    }
   }
 
-  detectPlayer(playerPosition) {
-    // Implement player detection logic
-    // Return true if player is within detection range, false otherwise
-    return true;
+  detectPlayer(playerPosition, walls) {
+    const dx = playerPosition.x - this._position.x;
+    const dy = playerPosition.y - this._position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= this.#detectionRange) {
+      // Check if there's a clear line of sight
+      const step = {
+        x: dx / distance,
+        y: dy / distance,
+      };
+
+      let checkPosition = {
+        ...this._position,
+        width: canvasSettings.cellWidth / 2,
+        height: canvasSettings.cellHeight / 2,
+      };
+      for (let i = 0; i < distance; i += canvasSettings.cellWidth / 2) {
+        checkPosition.x += step.x * (canvasSettings.cellWidth / 2);
+        checkPosition.y += step.y * (canvasSettings.cellWidth / 2);
+
+        if (
+          walls.some((wall) => isColliding(checkPosition, wall.getHitBox()))
+        ) {
+          return false; // Wall blocking the line of sight
+        }
+      }
+      return true; // Clear line of sight to the player
+    }
+    return false; // Player out of detection range
   }
 
   attack() {
-    this.action = 'attack';
-    this.#currentSprite = this.#sprites.orc1_Attack;
+    this.action = "attack";
+    this.#currentSprite = this._sprites["attack"];
   }
 
   defeat() {
-    this.action = 'dead';
-    this.#currentSprite = this.#sprites.orc1_Death;
+    this.action = "dead";
+    this.#currentSprite = this._sprites["death"];
     // Return dropped items (powerups, explosives, keys)
   }
 
-  update(playerPosition) {
+  update(playerPosition, walls) {
     const frames_per_action = 4;
     this.frameCount++;
     if (this.frameCount >= 10) {
       this.frameCount = 0;
       this.currentFrame = (this.currentFrame + 1) % frames_per_action;
     }
-    if (this.detectPlayer(playerPosition)) {
-      this.moveTowards(playerPosition);
+
+    if (this.detectPlayer(playerPosition, walls)) {
+      this.moveTowards(playerPosition, walls);
+    } else {
+      this.action = "idle";
     }
+
+    // Update current sprite based on action
+    this.#currentSprite =
+      this._sprites[this.action === "walk" ? "walk" : "idle"];
   }
 
   draw(ctx) {
@@ -75,17 +156,51 @@ class Guard {
     let spriteWidth = 64;
     let spriteX = this.currentFrame * spriteWidth;
     let spriteY = 0;
-    ctx.drawImage(
-      this.#currentSprite,
-      spriteX,
-      spriteY,
-      spriteWidth,
-      spriteHeight,
-      this.#position.x,
-      this.#position.y,
-      this.#width,
-      this.#height
-    );
+
+    // Determine spriteY based on movement direction
+    switch (this.movement) {
+      case "down":
+        spriteY = 0;
+        break;
+      case "left":
+        spriteY = spriteHeight;
+        break;
+      case "right":
+        spriteY = spriteHeight;
+        break;
+      case "up":
+        spriteY = spriteHeight * 2;
+        break;
+    }
+
+    ctx.save();
+    if (this.movement === "left") {
+      ctx.scale(-1, 1);
+      ctx.drawImage(
+        this.#currentSprite,
+        spriteX,
+        spriteY,
+        spriteWidth,
+        spriteHeight,
+        -this._position.x - this._width,
+        this._position.y,
+        this._width,
+        this._height
+      );
+    } else {
+      ctx.drawImage(
+        this.#currentSprite,
+        spriteX,
+        spriteY,
+        spriteWidth,
+        spriteHeight,
+        this._position.x,
+        this._position.y,
+        this._width,
+        this._height
+      );
+    }
+    ctx.restore();
   }
 }
 

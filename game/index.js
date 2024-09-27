@@ -1,5 +1,5 @@
 import { Game } from './game.js';
-import { loadPlayerAssets, loadLevelAssets, loadGuardAssets, loadLevelAssets } from './assets.js';
+import { loadPlayerAssets, loadLevelAssets, loadGuardAssets, loadPowerUpsAssets, } from './assets.js';
 import { showSplashScreen, updateSplashScreenProgress } from './screens/splash.js';
 import { showWelcomeScreen, showGameOverScreen, showHighScoreScreen, showLevelCompletedScreen } from './screens/index.js';
 import { canvasSettings, controlSettings } from './utils/settings.js';
@@ -18,6 +18,8 @@ class GameEngine {
         this.context = this.canvas.getContext('2d');
         this.canvas.width = canvasSettings.width;
         this.canvas.height = canvasSettings.height;
+        this.canvas.style.display = 'block';
+        this.canvas.style.margin = 'auto';
         this.container.appendChild(this.canvas);
         
         this.currentScreen = 'splash';
@@ -34,7 +36,7 @@ class GameEngine {
     async initialize() {
         try {
             console.log('Initializing game...');
-            const totalAssets = 3;
+            const totalAssets = 23 ;
             let loadedAssets = 0;
 
             const onProgress = (src, img) => {
@@ -47,8 +49,9 @@ class GameEngine {
             const playerAssets = await loadPlayerAssets(onProgress);
             const levelAssets = await loadLevelAssets(onProgress);
             const guardAssets = await loadGuardAssets(onProgress);
+            const powerupsAssets = await loadPowerUpsAssets(onProgress);
 
-            this.assets = { playerAssets, levelAssets, guardAssets };
+            this.assets = { playerAssets, levelAssets, guardAssets, powerupsAssets };
             this.game = new Game(this.container.id, this.canvas, this.context, this.assets);
             this.showScreen('welcome');
             this.setupGameControls();
@@ -71,7 +74,6 @@ class GameEngine {
         console.log('Showing screen:', screen);
         switch (screen) {
             case 'splash':
-                // await this.initialize();
                 showSplashScreen(this.initialize.bind(this), () => this.showScreen('welcome'));
                 break;
             case 'welcome':
@@ -84,7 +86,11 @@ class GameEngine {
                 break;
             case 'game':
                 console.log('Starting game...', this.game.canvas);
-                this.game.start();
+                if (!this.game.started) {
+                    this.game.start();
+                } else {
+                    this.game.continue();
+                }
                 break;
             case 'gameOver':
                 this.game.started = false;

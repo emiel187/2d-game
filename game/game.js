@@ -138,7 +138,7 @@ export class Game {
           debounceAction(() => this.player.axe(), 150)();
           break;
         case controlSettings.potion:
-          debounceAction(() => this.player.potion(), 150)();
+          debounceAction(() => this.player.potion(), 500)();
           break;
       }
     });
@@ -168,16 +168,19 @@ export class Game {
               );
               break;
             case "G":
-              this.guards.push(new Guard(position.x, position.y, this.assets.guardAssets));
+              const randomOrc = Math.floor(Math.random() * 2) + 1;
+              console.log(`orc${randomOrc}`);
+              this.guards.push(new Guard(position.x, position.y, `orc${randomOrc}`, this.assets.guardAssets));
               break;
             case "O":
               this.obstacles.push(
-                new Obstacle(position.x, position.y, this.assets)
+                new Obstacle(position.x, position.y, "normal", this.assets)
               );
               break;
-            case "P":
+            case "C":
+              const randomPowerup = Math.floor(Math.random() * 2) + 1;
               this.powerups.push(
-                new Powerup(position.x, position.y, "random", this.assets)
+                new Powerup(position.x, position.y, randomPowerup == 1 ? "health" : "mana", this.assets.powerupsAssets)
               );
               break;
           }
@@ -187,20 +190,36 @@ export class Game {
   }
 
   updateGameState() {
+    this.checkCollisions(); // Move this before player update
     this.player.update();
     this.explosives.forEach((explosive) => explosive.update());
-    this.guards.forEach((guard) => guard.update(this.player.getPosition()));
+    this.guards.forEach((guard) => guard.update(this.player.getHitBox(), this.walls));
     this.obstacles.forEach((obstacle) => obstacle.update());
     this.powerups.forEach((powerup) => powerup.update());
-    this.checkCollisions();
     this.checkLevelCompletion();
   }
 
   checkCollisions() {
-    const playerPosition = this.player.getPosition();
+    const playerPosition = this.player.getHitBox();
+
+    // Check collisions for each direction
+    ['left', 'right', 'up', 'down'].forEach(direction => {
+      const nextPosition = this.player.checkCollision(direction);
+      const willCollide = this.walls.some(wall => 
+        isColliding({
+          ...playerPosition,
+          x: nextPosition.x + playerPosition.width * 0.25,
+          y: nextPosition.y + playerPosition.height * 0.25
+        }, wall.getHitBox())
+      );
+      if (willCollide) {
+        this.player.collide({ getPosition: () => nextPosition });
+      }
+    });
 
     this.walls.forEach((wall) => {
-      if (isColliding(playerPosition, wall.getPosition())) {
+      if (isColliding(playerPosition, wall.getHitBox())) {
+        console.log("colliding with wall");
         this.player.collide(wall);
       }
     });
@@ -229,7 +248,7 @@ export class Game {
     });
 
     this.powerups.forEach((powerup, index) => {
-      if (isColliding(playerPosition, powerup.getPosition())) {
+      if (isColliding(this.player.getPickupRange(), powerup.getPosition())) {
         const effect = powerup.collect();
         this.player.applyPowerup(effect);
         this.powerups.splice(index, 1);
@@ -249,7 +268,7 @@ export class Game {
 
   isLevelComplete() {
     // Game ends when player reaches the exit
-    return isColliding(this.player, this.exit);
+    return isColliding(this.player.getHitBox(), this.exit);
   }
 
   render() {
@@ -268,6 +287,30 @@ export class Game {
 
     // Draw the player
     this.player.draw(this.context);
+
+    // Draw the grid
+    this.drawGrid();
+  }
+
+  drawGrid() {
+    this.context.strokeStyle = 'rgba(0, 255, 0, 0.1)'; // Light green with transparency
+    this.context.lineWidth = 1;
+
+    // Draw vertical lines
+    for (let x = 0; x <= this.canvas.width; x += canvasSettings.cellWidth) {
+      this.context.beginPath();
+      this.context.moveTo(x, 0);
+      this.context.lineTo(x, this.canvas.height);
+      this.context.stroke();
+    }
+
+    // Draw horizontal lines
+    for (let y = 0; y <= this.canvas.height; y += canvasSettings.cellHeight) {
+      this.context.beginPath();
+      this.context.moveTo(0, y);
+      this.context.lineTo(this.canvas.width, y);
+      this.context.stroke();
+    }
   }
 
   gameLoop() {
@@ -286,6 +329,12 @@ export class Game {
     this.initializePlayer();
     this.initializeEntities();
     this.gameLoop();
+  }
+
+  continue() {
+    this.started = true;
+    clearContainer(this.container);
+    this.container.appendChild(this.canvas);
   }
 }
 

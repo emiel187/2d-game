@@ -27,6 +27,8 @@ export const gameSettings = {
 
 // Entity settings
 export const entitySettings = {
+    enemyWidth: 91, // Width of the enemy
+    enemyHeight: 91, // Height of the enemy
     obstacleColor: '#c62828', // Color of obstacles (Carmen red)
     powerupColor: '#1565c0', // Color of powerups (Darker formal blue)
     guardColor: '#ff69b4', // Color of guards (funny pink color)

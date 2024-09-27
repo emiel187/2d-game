@@ -1,4 +1,5 @@
-import { canvasSettings } from '../utils/settings';
+import Entity from "./entity";
+import { canvasSettings } from "../utils/settings";
 
 // Obstacle entity class
 // - Represents the obstacles in the game
@@ -7,23 +8,20 @@ import { canvasSettings } from '../utils/settings';
 // - Can drop explosives when destroyed
 // - Can drop keys when destroyed
 // - Can drop keys when destroyed
-class Obstacle {
-  #position;
-  #width;
-  #height;
-  #health;
-  #sprite;
 
-  constructor(x, y, assets) {
-    this.#position = { x, y };
-    this.#width = canvasSettings.cellWidth;
-    this.#height = canvasSettings.cellHeight;
+class Obstacle extends Entity {
+  #health;
+  #type;
+
+  constructor(x, y, type, assets) {
+    super(x, y);
+    this.#type = type;
     this.#health = 100;
-    this.#sprite = assets.obstacleSprite;
+    this._sprite = assets.obstacleSprite;
   }
 
-  getPosition() {
-    return { ...this.#position };
+  getType() {
+    return this.#type;
   }
 
   takeDamage(amount) {
@@ -36,7 +34,7 @@ class Obstacle {
 
   destroy() {
     // Implement destruction logic
-    console.log('Obstacle destroyed!');
+    console.log("Obstacle destroyed!");
     // Return dropped items (powerups, explosives, keys)
   }
 
@@ -45,13 +43,15 @@ class Obstacle {
   }
 
   draw(ctx) {
-    // ctx.drawImage(
-    //   this.#sprite,
-    //   this.#position.x,
-    //   this.#position.y,
-    //   this.#width,
-    //   this.#height
-    // );
+    if (this.#health > 0) {
+      ctx.drawImage(
+        this._sprite,
+        this._position.x,
+        this._position.y,
+        this._width,
+        this._height
+      );
+    }
   }
 }
 
