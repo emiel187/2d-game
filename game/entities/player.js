@@ -5,6 +5,8 @@ class Player extends Entity {
   #health;
   #speed;
   #blockedDirections;
+  #isHurt = false;
+  #hurtInterval = null;
 
   constructor(x, y, assets) {
     super(x, y, 'player', assets);
@@ -24,6 +26,7 @@ class Player extends Entity {
     this.frameCount = 0;
     this.movement = "down";
     this.action = "idle";
+    this.visible = true;
   }
 
   selectSprites(assets) {
@@ -52,7 +55,7 @@ class Player extends Entity {
   }
 
   collide(entity) {
-    if (this.action !== "idle") {
+    if (this.action === "walk" && entity.type === "wall") {
       console.log("Colliding", this.action, entity.getPosition());
       this.action = "idle";
       
@@ -73,6 +76,11 @@ class Player extends Entity {
       }
       console.log("blocked directions", this.#blockedDirections);
     }
+    else if (entity.type === "guard") {
+      this.#health -= entity.damage;
+    //   this.hurtAnimation();
+      console.log("Player health:", this.#health);
+    }
   }
 
   canMove(direction) {
@@ -85,6 +93,8 @@ class Player extends Entity {
       this.action = "walk";
       this.movement = "left";
       this.#blockedDirections.right = false;
+      this.#blockedDirections.up = false;
+      this.#blockedDirections.down = false;
     }
   }
 
@@ -94,6 +104,8 @@ class Player extends Entity {
       this.action = "walk";
       this.movement = "right";
       this.#blockedDirections.left = false;
+      this.#blockedDirections.up = false;
+      this.#blockedDirections.down = false;
     }
   }
 
@@ -103,6 +115,8 @@ class Player extends Entity {
       this.action = "walk";
       this.movement = "up";
       this.#blockedDirections.down = false;
+      this.#blockedDirections.left = false;
+      this.#blockedDirections.right = false;
     }
   }
 
@@ -112,6 +126,8 @@ class Player extends Entity {
       this.action = "walk";
       this.movement = "down";
       this.#blockedDirections.up = false;
+      this.#blockedDirections.left = false;
+      this.#blockedDirections.right = false;
     }
   }
 
@@ -229,7 +245,31 @@ class Player extends Entity {
     return nextPosition;
   }
 
+  hurtAnimation() {
+    if (this.#isHurt) return;
+
+    this.#isHurt = true;
+    this.action = "idle"; // Freeze the player
+
+    let flickerCount = 0;
+    const maxFlickers = 10;
+    const flickerDuration = 100; // milliseconds
+
+    this.#hurtInterval = setInterval(() => {
+      this.visible = !this.visible; // Toggle visibility
+      flickerCount++;
+
+      if (flickerCount >= maxFlickers) {
+        clearInterval(this.#isHurt);
+        this.#isHurt = false;
+        this.visible = true; // Ensure player is visible after flickering
+      }
+    }, flickerDuration);
+  }
+
   draw(ctx) {
+    if (!this.visible) return;
+
     let spriteHeight = 32;
     let spriteWidth = 32;
     let spriteX = 0;
@@ -383,7 +423,7 @@ class Player extends Entity {
       );
     }
     ctx.restore();
-    this.drawBoundingBox(ctx);
+    // this.drawBoundingBox(ctx);
   }
 
   drawBoundingBox(ctx) {

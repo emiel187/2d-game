@@ -181,6 +181,27 @@ export async function loadLevelAssets(onProgress) {
     require("../assets/images/obstacle/Rock6_1.png"),
     onProgress
   );
+  const tree1 = await loadImage(
+    require("../assets/images/obstacle/Tree1.png"),
+    onProgress
+  );
+  const tree2 = await loadImage(
+    require("../assets/images/obstacle/Tree2.png"),
+    onProgress
+  );
+  const tree3 = await loadImage(
+    require("../assets/images/obstacle/Tree3.png"),
+    onProgress
+  );
+  const palm1 = await loadImage(
+    require("../assets/images/obstacle/Palm_tree1_2.png"),
+    onProgress
+  );
+  const palm2 = await loadImage(
+    require("../assets/images/obstacle/Palm_tree2_2.png"),
+    onProgress
+  );
+  
   const sandRuin = await loadImage(
     require("../assets/images/exit/Sand_ruins3.png"),
     onProgress
@@ -196,7 +217,7 @@ export async function loadLevelAssets(onProgress) {
     onProgress
   );
 
-  return { rock, sandRuin, snowRuin, yellowRuin };
+  return { rock, tree1, tree2, tree3, palm1, palm2, sandRuin, snowRuin, yellowRuin };
 }
 
 export async function loadPowerUpsAssets(onProgress) {

@@ -36,7 +36,7 @@ class GameEngine {
     async initialize() {
         try {
             console.log('Initializing game...');
-            const totalAssets = 26;
+            const totalAssets = 34;
             let loadedAssets = 0;
 
             const onProgress = (src, img) => {
@@ -89,7 +89,7 @@ class GameEngine {
                 showStoryScreen(() => this.showScreen('welcome'));
                 break;
             case 'game':
-                console.log('Starting game...', this.game.canvas);
+                console.log('Starting game...');
                 if (!this.game.started) {
                     this.game.start();
                 } else {

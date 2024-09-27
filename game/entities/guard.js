@@ -31,6 +31,7 @@ class Guard extends Entity {
     this.movement = ["down", "up", "left", "right"][
       Math.floor(Math.random() * 4)
     ];
+    this.damage = 10;
     this.#speed = 1;
     this.#detectionRange = 5 * canvasSettings.cellWidth;
     this.#currentSprite = this._sprites.idle;

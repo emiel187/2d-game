@@ -37,7 +37,19 @@ class Exit extends Entity {
 
   draw(ctx) {
     // Draw a semi-transparent dark rectangle over the current cell
-    ctx.fillStyle = 'rgba(255, 255, 200, 0.3)'; // Light yellow color with 30% opacity
+    // Create a radial gradient
+    const gradient = ctx.createRadialGradient(
+      this._position.x + this._width / 2,
+      this._position.y + this._height / 2,
+      0,
+      this._position.x + this._width / 2,
+      this._position.y + this._height / 2,
+      Math.max(this._width, this._height) / 2
+    );
+    gradient.addColorStop(0, 'rgba(255, 255, 200, 0.5)'); // Lighter in the middle
+    gradient.addColorStop(1, 'rgba(255, 255, 200, 0.1)'); // Darker at the edges
+
+    ctx.fillStyle = gradient;
     ctx.fillRect(
       this._position.x,
       this._position.y,

@@ -22,11 +22,6 @@ class Wall extends Entity {
     return this.#type;
   }
 
-  collide(entity) {
-    // Basic collision logic
-    console.log(`Collision with ${entity.constructor.name}`);
-  }
-
   update() {
     // Update wall state if needed (e.g., for breakable walls)
   }

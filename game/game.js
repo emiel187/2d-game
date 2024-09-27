@@ -169,7 +169,12 @@ export class Game {
               break;
             case "O":
               this.obstacles.push(
-                new Obstacle(position.x, position.y, "normal", this.assets)
+                new Obstacle(position.x, position.y, "boulder", this.assets.levelAssets)
+              );
+              break;
+            case "T":
+              this.obstacles.push(
+                new Obstacle(position.x, position.y, "tree", this.assets.levelAssets)
               );
               break;
             case "C":
@@ -199,7 +204,7 @@ export class Game {
 
     // Check collisions for each direction
     ['left', 'right', 'up', 'down'].forEach(direction => {
-      const nextPosition = this.player.checkCollision(direction);
+      const nextPosition = this.player.checkCollision(this.movement);
       const willCollide = this.walls.some(wall => 
         isColliding({
           ...playerPosition,
@@ -208,7 +213,7 @@ export class Game {
         }, wall.getHitBox())
       );
       if (willCollide) {
-        this.player.collide({ getPosition: () => nextPosition });
+        this.player.collide({ type: "wall", getPosition: () => nextPosition });
       }
     });
 
@@ -233,6 +238,7 @@ export class Game {
     this.guards.forEach((guard, index) => {
       if (isColliding(playerPosition, guard.getPosition())) {
         // Handle player-guard interaction
+        this.player.collide(guard);
       }
     });
 

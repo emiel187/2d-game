@@ -10,17 +10,16 @@ import Entity from "./entity.js";
 
 class Obstacle extends Entity {
   #health;
-  #type;
 
   constructor(x, y, type, assets) {
-    super(x, y);
-    this.#type = type;
+    super(x, y, type, assets);
     this.#health = 100;
-    this._sprite = assets.obstacleSprite;
-  }
-
-  getType() {
-    return this.#type;
+    if (type === "boulder") {
+      this._sprite = assets.rock;
+    } else if (type === "tree") {
+      const randomTree = Math.floor(Math.random() * 2) + 1;
+      this._sprite = assets[`palm${randomTree}`];
+    }
   }
 
   takeDamage(amount) {
