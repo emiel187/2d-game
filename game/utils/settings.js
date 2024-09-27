@@ -49,7 +49,7 @@ export const controlSettings = {
     left: 'ArrowLeft', // Key for moving left
     right: 'ArrowRight', // Key for moving right
     attack: 'a', // Key for attacking
-    jump: ' ', // Key for jumping
+    space: ' ', // Key for jumping
     esc: 'Escape', // Key for going back to the welcome screen
     pick: 'p', // Key for picking
     axe: 'x', // Key for axe

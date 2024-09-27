@@ -4,8 +4,8 @@ node_modules/
 # Parcel cache
 .cache/
 
-# Dist folder
-dist/
+# # Dist folder
+# dist/
 
 # Logs
 logs/

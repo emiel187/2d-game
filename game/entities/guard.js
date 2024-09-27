@@ -170,9 +170,10 @@ class Guard extends Entity {
 
   update(playerPosition, walls) {
     const frames_per_action = 4;
-    const frames_per_look = this.action === 'idle' ? 60*3 : 0; // Look around every 60 frames (about 1 second at 60 FPS)
+    const frames_per_look =  60*3; // Look around every 60 frames (about 1 second at 60 FPS)
+    const max_frame_count = this.action === 'idle' ? 60*3 : 20; 
     this.frameCount++;
-    if (this.frameCount >= Math.max(frames_per_action, frames_per_look)) {
+    if (this.frameCount >= max_frame_count) {
       this.frameCount = 0;
       this.currentFrame = (this.currentFrame + 1) % frames_per_action;
     }
@@ -218,7 +219,7 @@ class Guard extends Entity {
         spriteWidth,
         spriteHeight,
         this._position.x - 10,
-        this._position.y,
+        this._position.y - 10,
         this._width,
         this._height
       );

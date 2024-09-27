@@ -112,6 +112,41 @@ export async function loadGuardAssets(onProgress) {
     onProgress
   );
 
+  // ORC 3
+  const orc3_Attack = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_attack_full.png"),
+    onProgress
+  );
+  const orc3_Death = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_death_full.png"),
+    onProgress
+  );    
+  const orc3_Hurt = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_hurt_full.png"),
+    onProgress
+  );
+  const orc3_Idle = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_idle_full.png"),
+    onProgress
+  );    
+  const orc3_Run = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_run_full.png"),
+    onProgress
+  );
+  const orc3_Run_Attack = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_run_attack_full.png"),
+    onProgress
+  );    
+  const orc3_Walk = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_walk_full.png"),
+    onProgress
+  );
+  const orc3_Walk_Attack = await loadImage(
+    require("../assets/images/enemies/orc3/orc3_walk_attack_full.png"),
+    onProgress
+  );
+  
+
   return {
     orc1_Attack,
     orc1_Death,
@@ -129,6 +164,14 @@ export async function loadGuardAssets(onProgress) {
     orc2_Run_Attack,
     orc2_Walk,
     orc2_Walk_Attack,
+    orc3_Attack,
+    orc3_Death,
+    orc3_Hurt,
+    orc3_Idle,
+    orc3_Run,
+    orc3_Run_Attack,
+    orc3_Walk,
+    orc3_Walk_Attack,
   };
 }
 

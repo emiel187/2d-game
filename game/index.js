@@ -36,7 +36,7 @@ class GameEngine {
     async initialize() {
         try {
             console.log('Initializing game...');
-            const totalAssets = 23 ;
+            const totalAssets = 26;
             let loadedAssets = 0;
 
             const onProgress = (src, img) => {

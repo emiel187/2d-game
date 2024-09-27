@@ -14,6 +14,7 @@ import Guard from "./entities/guard.js";
 import Obstacle from "./entities/obstacle.js";
 import Powerup from "./entities/powerup.js";
 import Exit from "./entities/exit.js";
+import { showGameOverScreen } from "./screens/game-over.js";
 
 // Main game logic
 // - Initialize the game board (labyrinth)
@@ -163,7 +164,7 @@ export class Game {
               );
               break;
             case "G":
-              const randomOrc = Math.floor(Math.random() * 2) + 1;
+              const randomOrc = Math.floor(Math.random() * 3) + 1;
               console.log(`orc${randomOrc}`);
               this.guards.push(new Guard(position.x, position.y, `orc${randomOrc}`, this.assets.guardAssets));
               break;
@@ -263,7 +264,7 @@ export class Game {
 
   isLevelComplete() {
     // Game ends when player reaches the exit
-    return isColliding(this.player.getHitBox(), this.exit);
+    return isColliding(this.player.getHitBox(), this.exit.getHitBox());
   }
 
   render() {
@@ -271,14 +272,17 @@ export class Game {
     // Clear the canvas
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    // Draw the grid
+    this.drawGrid();
+
     // Draw the walls
     this.walls.forEach((wall) => wall.draw(this.context));
 
     // Draw the entities
-    this.explosives.forEach((explosive) => explosive.draw(this.context));
-    this.guards.forEach((guard) => guard.draw(this.context));
     this.obstacles.forEach((obstacle) => obstacle.draw(this.context));
     this.powerups.forEach((powerup) => powerup.draw(this.context));
+    this.guards.forEach((guard) => guard.draw(this.context));
+    this.explosives.forEach((explosive) => explosive.draw(this.context));
 
     // Draw the exit
     if (this.exit) {
@@ -288,29 +292,42 @@ export class Game {
     // Draw the player
     this.player.draw(this.context);
 
-    // Draw the grid
-    this.drawGrid();
+    
   }
 
   drawGrid() {
-    this.context.strokeStyle = 'rgba(0, 255, 0, 0.1)'; // Light green with transparency
+    // Create a gradient for the background
+    const gradient = this.context.createRadialGradient(
+      this.canvas.width / 2, this.canvas.height / 2, 0,
+      this.canvas.width / 2, this.canvas.height / 2, Math.max(this.canvas.width, this.canvas.height) / 2
+    );
+    gradient.addColorStop(0, '#3E8948');  // Center color (lighter green)
+    gradient.addColorStop(1, '#1A3B1F');  // Edge color (darker green)
+
+    // Fill background with gradient
+    this.context.fillStyle = gradient;
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Set grid style
+    this.context.strokeStyle = 'rgba(0, 255, 0, 0.1)';
     this.context.lineWidth = 1;
 
-    // Draw vertical lines
+    // Draw grid lines
+    this.context.beginPath();
+
+    // Vertical lines
     for (let x = 0; x <= this.canvas.width; x += canvasSettings.cellWidth) {
-      this.context.beginPath();
       this.context.moveTo(x, 0);
       this.context.lineTo(x, this.canvas.height);
-      this.context.stroke();
     }
 
-    // Draw horizontal lines
+    // Horizontal lines
     for (let y = 0; y <= this.canvas.height; y += canvasSettings.cellHeight) {
-      this.context.beginPath();
       this.context.moveTo(0, y);
       this.context.lineTo(this.canvas.width, y);
-      this.context.stroke();
     }
+
+    this.context.stroke();
   }
 
   gameLoop() {
